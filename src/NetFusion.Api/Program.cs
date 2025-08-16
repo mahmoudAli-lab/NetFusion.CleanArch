@@ -16,6 +16,12 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCrossCutting();
 
 var app = builder.Build();
+// Apply EF Core migrations at startup (Docker-friendly)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<NetFusion.Infrastructure.Persistence.AppDbContext>();
+    db.Database.Migrate();
+}
 
 // Middlewares
 app.UseHttpsRedirection();
